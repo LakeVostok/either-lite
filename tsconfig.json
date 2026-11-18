@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "es2022",
+    "module": "nodenext",
+    "declaration": true,
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "stripInternal": true,
+    "types": ["node"]
+  },
+  "files": [
+    "either.ts",
+    "either.test.ts"
+  ]
+}
