@@ -25,8 +25,16 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: npm
     steps:
       - uses: actions/checkout@v4
+
+      - name: Stable releases only from main
+        run: |
+          if [ "${{ inputs.version_type }}" != "beta" ] && [ "${{ github.ref_name }}" != "main" ]; then
+            echo "::error::Stable releases (${{ inputs.version_type }}) must be published from 'main', not '${{ github.ref_name }}'. Use 'beta' for prereleases from other branches."
+            exit 1
+          fi
 
       - uses: actions/setup-node@v4
         with:
@@ -40,7 +48,9 @@ jobs:
       - name: Bump version
         run: |
           if [ "${{ inputs.version_type }}" = "beta" ]; then
-            npm version prerelease --preid=beta --no-git-tag-version
+            SLUG=$(printf '%s' "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g; s/-\+/-/g; s/^-//; s/-$//' | cut -c1-20)
+            [ -n "$SLUG" ] || SLUG=branch
+            npm version prerelease --preid="beta.${SLUG}" --no-git-tag-version
           else
             npm version "${{ inputs.version_type }}" --no-git-tag-version
           fi
@@ -52,7 +62,7 @@ jobs:
           if [ "${{ inputs.version_type }}" = "beta" ]; then
             npm publish --provenance --tag beta
           else
-            npm publish --provenance
+            npm publish --provenance --tag latest
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
