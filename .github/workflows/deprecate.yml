@@ -1,0 +1,40 @@
+name: Deprecate npm prerelease
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Prerelease version to deprecate, e.g. 0.1.2-beta.0"
+        required: true
+        type: string
+      message:
+        description: "Warning shown when the version is installed"
+        required: false
+        type: string
+        default: "This prerelease is deprecated; install either-lite@latest instead."
+
+jobs:
+  deprecate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Validate version is a prerelease
+        run: |
+          VERSION="${{ inputs.version }}"
+          if ! printf '%s' "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+-'; then
+            echo "::error::Refusing to deprecate '$VERSION' — only prerelease versions (e.g. 1.2.3-beta.0) are allowed."
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Check the version exists on npm
+        run: npm view "either-lite@${VERSION}" version
+
+      - name: Deprecate
+        run: npm deprecate "either-lite@${VERSION}" "${{ inputs.message }}"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
