@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Prerelease version to deprecate, e.g. 0.1.2-beta.0"
+        description: "Prerelease version to deprecate — the 'List published versions' step output shows all of them"
         required: true
         type: string
       message:
@@ -13,14 +13,20 @@ on:
         type: string
         default: "This prerelease is deprecated; install either-lite@latest instead."
 
+permissions:
+  contents: read
+
 jobs:
   deprecate:
     runs-on: ubuntu-latest
+    environment: npm
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
+          node-version: 24
+
+      - name: List published versions
+        run: npm view either-lite versions
 
       - name: Validate version is a prerelease
         run: |
