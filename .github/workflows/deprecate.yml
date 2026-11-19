@@ -30,6 +30,11 @@ jobs:
         with:
           node-version: 24
 
+      - name: Configure npm authentication
+        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > "$HOME/.npmrc"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: List published versions
         run: npm view either-lite versions
 
@@ -50,5 +55,3 @@ jobs:
 
       - name: Deprecate
         run: npm deprecate "either-lite@${VERSION}" "${{ inputs.message }}"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
