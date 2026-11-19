@@ -50,7 +50,7 @@ jobs:
           if [ "${{ inputs.version_type }}" = "beta" ]; then
             SLUG=$(printf '%s' "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g; s/-\+/-/g; s/^-//; s/-$//' | cut -c1-20)
             [ -n "$SLUG" ] || SLUG=branch
-            npm version prerelease --preid="beta.${SLUG}" --no-git-tag-version
+            npm version prerelease --preid="beta-${SLUG}" --no-git-tag-version
           else
             npm version "${{ inputs.version_type }}" --no-git-tag-version
           fi
