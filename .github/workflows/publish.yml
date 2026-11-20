@@ -80,11 +80,22 @@ jobs:
       - name: Merge release PR once checks pass
         if: inputs.version_type != 'beta'
         env:
-          GH_TOKEN: ${{ github.token }}
+          # PAT rather than GITHUB_TOKEN: events created with the default token
+          # don't trigger workflows, so a bot-opened PR would never run check
+          GH_TOKEN: ${{ secrets.RELEASE_PAT }}
         run: |
           gh pr create --base "${{ github.ref_name }}" --head "release/v${VERSION}" \
             --title "chore: release v${VERSION}" \
             --body "Automated release PR. Merges once the Check workflow passes, then tags and publishes to npm."
+
+          # the check suite registers a few seconds after PR creation; asking
+          # earlier makes gh pr checks fail with "no checks reported"
+          for i in $(seq 1 60); do
+            if gh pr checks 2>/dev/null; then
+              break
+            fi
+            sleep 5
+          done
           gh pr checks --watch
           gh pr merge --rebase --delete-branch
 
