@@ -1,6 +1,6 @@
 {
   "name": "either-lite",
-  "version": "0.1.1-beta-implementation.1",
+  "version": "1.0.0",
   "description": "Minimal Either with typed async chains — left/right factories, type-guard narrowing, fail-loud handlers, zero dependencies",
   "main": "dist/either.js",
   "types": "dist/either.d.ts",
