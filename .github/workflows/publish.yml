@@ -29,10 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Stable releases only from main
+      - name: Stable releases only from main or master
         run: |
-          if [ "${{ inputs.version_type }}" != "beta" ] && [ "${{ github.ref_name }}" != "main" ]; then
-            echo "::error::Stable releases (${{ inputs.version_type }}) must be published from 'main', not '${{ github.ref_name }}'. Use 'beta' for prereleases from other branches."
+          if [ "${{ inputs.version_type }}" != "beta" ] && [ "${{ github.ref_name }}" != "main" ] && [ "${{ github.ref_name }}" != "master" ]; then
+            echo "::error::Stable releases (${{ inputs.version_type }}) must be published from 'main' or 'master', not '${{ github.ref_name }}'. Use 'beta' for prereleases from other branches."
             exit 1
           fi
 
